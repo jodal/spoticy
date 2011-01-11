@@ -44,6 +44,13 @@ How to get started developing
       git clone git://github.com/jodal/spoticy.git
       cd spoticy/
 
+#. Create a file named ``tests/settings.py`` containing the following::
+
+      SPOTIFY_USERNAME = u'alice'
+      SPOTIFY_PASSWORD = u'secret'
+
+   Replace ``alice`` and ``secret`` with your own Spotify Premium account.
+
 #. Build and run tests::
 
       make

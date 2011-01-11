@@ -1,6 +1,7 @@
 import unittest
 
 import spoticy
+from tests.settings import SPOTIFY_USERNAME, SPOTIFY_PASSWORD
 
 class SessionTest(unittest.TestCase):
     def setUp(self):
@@ -15,13 +16,13 @@ class SessionTest(unittest.TestCase):
 
     def test_login_should_not_raise_exceptions(self):
         session = spoticy.Session(self.application_key)
-        session.login(u'jodal', u's0llin31')
+        session.login(SPOTIFY_USERNAME, SPOTIFY_PASSWORD)
         # TODO After logged_in callback, this should be true:
         #self.assertEqual(1, session.connection_state)
 
     def test_logout_should_not_raise_exceptions(self):
         session = spoticy.Session(self.application_key)
-        session.login(u'jodal', u's0llin31')
+        session.login(SPOTIFY_USERNAME, SPOTIFY_PASSWORD)
         session.logout()
         # TODO After logged_in callback, this should be true:
         #self.assertEqual(2, session.connection_state)
