@@ -2,14 +2,7 @@ cimport python_unicode
 
 cimport libspotify
 
-### String handling
-
-cdef unicode to_unicode(char* s):
-    return s.decode('UTF-8', 'strict')
-
-cdef char* to_string(unicode u):
-    s = u.encode('UTF-8', 'strict')
-    return s
+ENCODING = 'utf-8'
 
 
 ### Error handling
@@ -119,21 +112,24 @@ cdef class SessionConfig(object):
         self._config.api_version = libspotify.SPOTIFY_API_VERSION
 
         if cache_location is None:
-            cache_location = u''
-        cache_location_str = to_string(cache_location)
+            cache_location_str = ''
+        else:
+            cache_location_str = cache_location.encode(ENCODING)
         self._config.cache_location = cache_location_str
 
         if settings_location is None:
-            settings_location = u'tmp'
-        settings_location_str = to_string(settings_location)
+            settings_location_str = 'tmp'
+        else:
+            settings_location_str = settings_location.encode(ENCODING)
         self._config.settings_location = settings_location_str
 
         self._config.application_key = <void*>(<char*> self._application_key)
         self._config.application_key_size = len(self._application_key)
 
         if user_agent is None:
-            user_agent = u'Spoticy'
-        user_agent_str = to_string(user_agent)
+            user_agent_str = 'Spoticy'
+        else:
+            user_agent_str = user_agent.encode(ENCODING)
         self._config.user_agent = user_agent_str
 
         # TODO Add more callbacks
@@ -150,11 +146,11 @@ cdef class SessionConfig(object):
 
     property cache_location:
         def __get__(self):
-            return to_unicode(<char*> self._config.cache_location)
+            return self._config.cache_location.decode(ENCODING)
 
     property settings_location:
         def __get__(self):
-            return to_unicode(<char*> self._config.settings_location)
+            return self._config.settings_location.decode(ENCODING)
 
     property application_key:
         def __get__(self):
@@ -166,7 +162,7 @@ cdef class SessionConfig(object):
 
     property user_agent:
         def __get__(self):
-            return to_unicode(<char*> self._config.user_agent)
+            return self._config.user_agent.decode(ENCODING)
 
     property userdata:
         def __get__(self):
@@ -205,8 +201,8 @@ cdef class Session(object):
     def login(self, unicode username, unicode password):
         if self._session is NULL:
             raise Exception(u'Session not initialized')
-        username_str = to_string(username)
-        password_str = to_string(password)
+        username_str = username.encode(ENCODING)
+        password_str = password.encode(ENCODING)
         is_ok(libspotify.sp_session_login(
             self._session, username_str, password_str))
 
