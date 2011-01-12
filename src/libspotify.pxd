@@ -1,5 +1,7 @@
 cdef extern from 'libspotify/api.h':
 
+    int SPOTIFY_API_VERSION
+
     ### Opaque types/handles
 
     cdef struct sp_session:
@@ -62,7 +64,23 @@ cdef extern from 'libspotify/api.h':
         int stutter
 
     cdef struct sp_session_callbacks:
-        pass # TODO
+        void logged_in(sp_session* session, sp_error error)
+        void logged_out(sp_session* session)
+        void metadata_updated(sp_session* session)
+        void connection_error(sp_session* session, sp_error error)
+        void message_to_user(sp_session* session, char* message)
+        void notify_main_thread(sp_session* session)
+        void music_delivery(sp_session* session, sp_audioformat* format,
+            void* frames, int num_frames)
+        void play_token_lost(sp_session* session)
+        void log_message(sp_session* session, char* data)
+        void end_of_track(sp_session* session)
+        void streaming_error(sp_session* session, sp_error error)
+        void userinfo_updated(sp_session* session)
+        void start_playback(sp_session* session)
+        void stop_playback(sp_session* session)
+        void get_audio_buffer_stats(sp_session* session,
+            sp_audio_buffer_stats* stats)
 
     cdef struct sp_session_config:
         int api_version
@@ -88,3 +106,5 @@ cdef extern from 'libspotify/api.h':
     cdef sp_error sp_session_logout(sp_session* session)
 
     cdef sp_connectionstate sp_session_connectionstate(sp_session* session)
+
+    cdef void* sp_session_userdata(sp_session* session)
