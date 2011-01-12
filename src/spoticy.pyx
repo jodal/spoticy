@@ -1,4 +1,5 @@
 cimport python_unicode
+cimport stdlib
 
 cimport libspotify
 
@@ -105,6 +106,14 @@ cdef class SessionConfig(object):
     cdef bytes _application_key
     cdef object _session_callbacks
 
+    def __cinit__(self):
+        self._c_callbacks = <libspotify.sp_session_callbacks*> \
+            stdlib.malloc(sizeof(libspotify.sp_session_callbacks))
+
+    def __dealloc__(self):
+        if self._c_config.callbacks is not NULL:
+            stdlib.free(self._c_callbacks)
+
     def __init__(self, bytes application_key, object session_callbacks,
             unicode cache_location=None, unicode settings_location=None,
             unicode user_agent=None, bint tiny_settings=False):
@@ -136,9 +145,8 @@ cdef class SessionConfig(object):
         user_agent_str = to_string(user_agent)
         self._c_config.user_agent = user_agent_str
 
-        # FIXME Assign pointer to callback function to struct
-        #self._c_callbacks.logged_in = logged_in_callback
-        #self._c_config.callbacks = self._c_callbacks
+        self._c_callbacks.logged_in = logged_in_callback
+        # TODO Assign pointer to callback struct to config struct
 
         self._c_config.userdata = <void*> self._session_callbacks
 
