@@ -35,7 +35,8 @@ class SessionConfigTest(unittest.TestCase):
             config.cache_location = u'/somewhere/else'
             self.fail(u'Should not be writable')
         except AttributeError:
-            self.assertEqual(u'', config.cache_location)
+            pass
+        self.assertEqual(u'', config.cache_location)
 
 
     def test_settings_location_defaults_to_tmp_in_current_dir(self):
@@ -58,7 +59,8 @@ class SessionConfigTest(unittest.TestCase):
             config.settings_location = u'/somewhere/else'
             self.fail(u'Should not be writable')
         except AttributeError:
-            self.assertEqual(u'tmp', config.settings_location)
+            pass
+        self.assertEqual(u'tmp', config.settings_location)
 
 
     def test_create_config_without_application_key_should_fail(self):
@@ -80,7 +82,8 @@ class SessionConfigTest(unittest.TestCase):
             config.application_key = '456'
             self.fail(u'Should not be writable')
         except AttributeError:
-            self.assertEqual('123', config.application_key)
+            pass
+        self.assertEqual('123', config.application_key)
 
 
     def test_application_key_size_is_the_size_in_bytes(self):
@@ -95,7 +98,8 @@ class SessionConfigTest(unittest.TestCase):
             config.application_key_size = 5
             self.fail(u'Should not be writable')
         except AttributeError:
-            self.assertEqual(3, config.application_key_size)
+            pass
+        self.assertEqual(3, config.application_key_size)
 
 
     def test_user_agent_defaults_to_spoticy(self):
@@ -118,7 +122,8 @@ class SessionConfigTest(unittest.TestCase):
             config.user_agent = u'Something else'
             self.fail(u'Should not be writable')
         except AttributeError:
-            self.assertEqual(u'Spoticy', config.user_agent)
+            pass
+        self.assertEqual(u'Spoticy', config.user_agent)
 
 
     # TODO callbacks
@@ -153,4 +158,5 @@ class SessionConfigTest(unittest.TestCase):
             config.tiny_settings = True
             self.fail(u'Should not be writable')
         except AttributeError:
-            self.assertEqual(False, config.tiny_settings)
+            pass
+        self.assertEqual(False, config.tiny_settings)
