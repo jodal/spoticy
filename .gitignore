@@ -4,3 +4,4 @@
 *.swp
 build/
 tests/settings.py
+tmp/
