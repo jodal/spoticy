@@ -7,14 +7,17 @@ ENCODING = 'utf-8'
 
 ### Error handling
 
+ERROR_OK = 0
+
 class SpotifyException(Exception):
     def __init__(self, sp_error):
+        self.error_code = sp_error
         message = '%s (sp_error=%d)' % (
             libspotify.sp_error_message(sp_error), sp_error)
         super(Exception, self).__init__(message)
 
 cpdef bint is_ok(libspotify.sp_error sp_error) except False:
-    if sp_error == 0:
+    if sp_error == ERROR_OK:
         return True
     else:
         raise SpotifyException(sp_error)
