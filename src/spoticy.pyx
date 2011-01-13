@@ -79,7 +79,7 @@ class SessionCallbacks(object):
 
 
 cdef void session_callback_logged_in(libspotify.sp_session* sp_session,
-        libspotify.sp_error sp_error):
+        libspotify.sp_error sp_error) with gil:
     cdef void* userdata = libspotify.sp_session_userdata(sp_session)
     cdef object session_callbacks
     cdef Session session
@@ -89,7 +89,8 @@ cdef void session_callback_logged_in(libspotify.sp_session* sp_session,
         session._session = sp_session
         session_callbacks.logged_in(session, sp_error)
 
-cdef void session_callback_logged_out(libspotify.sp_session* sp_session):
+cdef void session_callback_logged_out(libspotify.sp_session* sp_session) \
+        with gil:
     cdef void* userdata = libspotify.sp_session_userdata(sp_session)
     cdef object session_callbacks
     cdef Session session
@@ -100,7 +101,7 @@ cdef void session_callback_logged_out(libspotify.sp_session* sp_session):
         session_callbacks.logged_out(session)
 
 cdef void session_callback_connection_error(libspotify.sp_session* sp_session,
-        libspotify.sp_error sp_error):
+        libspotify.sp_error sp_error) with gil:
     cdef void* userdata = libspotify.sp_session_userdata(sp_session)
     cdef object session_callbacks
     cdef Session session
@@ -111,7 +112,7 @@ cdef void session_callback_connection_error(libspotify.sp_session* sp_session,
         session_callbacks.connection_error(session, sp_error)
 
 cdef void session_callback_notify_main_thread(
-        libspotify.sp_session* sp_session):
+        libspotify.sp_session* sp_session) with gil:
     cdef void* userdata = libspotify.sp_session_userdata(sp_session)
     cdef object session_callbacks
     cdef Session session

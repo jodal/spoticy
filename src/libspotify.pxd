@@ -38,7 +38,7 @@ cdef extern from 'libspotify/api.h':
     cdef enum sp_error:
         pass
 
-    cdef char* sp_error_message(sp_error error)
+    cdef char* sp_error_message(sp_error error) nogil
 
     ### Session handling
 
@@ -94,19 +94,21 @@ cdef extern from 'libspotify/api.h':
         bint tiny_settings
 
     cdef sp_error sp_session_create(sp_session_config* config, sp_session**
-            session)
+            session) nogil
 
-    cdef void sp_session_release(sp_session* session)
+    cdef void sp_session_release(sp_session* session) nogil
 
     cdef sp_error sp_session_login(sp_session* session, char* username, char*
-            password)
+            password) nogil
 
-    cdef sp_user* sp_session_user(sp_session* session)
+    cdef sp_user* sp_session_user(sp_session* session) nogil
 
-    cdef sp_error sp_session_logout(sp_session* session)
+    cdef sp_error sp_session_logout(sp_session* session) nogil
 
-    cdef sp_connectionstate sp_session_connectionstate(sp_session* session)
+    cdef sp_connectionstate sp_session_connectionstate(sp_session* session) \
+        nogil
 
-    cdef void* sp_session_userdata(sp_session* session)
+    cdef void* sp_session_userdata(sp_session* session) nogil
 
-    cdef void* sp_session_process_events(sp_session* session, int* next_time)
+    cdef void* sp_session_process_events(sp_session* session, int* next_time) \
+        nogil
