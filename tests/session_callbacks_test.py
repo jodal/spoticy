@@ -1,36 +1,48 @@
+import datetime
 import threading
 import unittest
 
 import spoticy
 from tests.settings import SPOTIFY_USERNAME, SPOTIFY_PASSWORD
 
+def log(message, **data):
+    print '%s [%s] %s %s' % (datetime.datetime.now(),
+        threading.current_thread().name, message, data)
+
+awoken = threading.Event()
 timer = None
 logged_in_event = threading.Event()
 logged_out_event = threading.Event()
 
 def wait_for_event(session, event):
-    while event.wait(0.1) or not event.is_set():
+    while not event.is_set():
+        awoken.clear()
         timeout = session.process_events()
-        timer = threading.Timer(timeout / 1000., lambda: None)
+        timer = threading.Timer(timeout / 1000., awoken.set)
         timer.start()
+        awoken.wait()
+        timer.cancel()
+    event.clear()
 
 
 class TestSessionCallbacks(spoticy.SessionCallbacks):
     def logged_in(self, session, error):
-        print 'logged_in called. Error: %d' % error
+        log('logged_in called', error=error)
         logged_in_event.set()
+        awoken.set()
 
     def logged_out(self, session):
-        print 'logged_out called'
+        log('logged_out called')
         logged_out_event.set()
+        awoken.set()
 
     def connection_error(self, session, error):
-        print 'connection_error called. Error: %d' % error
+        log('connection_error called', error=error)
 
     def notify_main_thread(self, session):
-        print 'notify_main_thread called'
-        if timer is not None:
-            timer.cancel()
+        log('notify_main_thread called')
+        awoken.set()
+
 
 class SessionCallbacksTest(unittest.TestCase):
     def setUp(self):
@@ -38,18 +50,17 @@ class SessionCallbacksTest(unittest.TestCase):
         self.config = spoticy.SessionConfig(
             self.application_key, TestSessionCallbacks())
 
-    def test_login_changes_connection_state(self):
+    def test_login_and_logout_changes_connection_state(self):
         session = spoticy.Session(self.config)
-        session.login(SPOTIFY_USERNAME, SPOTIFY_PASSWORD)
-        # FIXME Make this pass
-        #wait_for_event(session, logged_in_event)
-        #self.assertEqual(1, session.connection_state)
+        self.assertEqual(spoticy.CONNECTION_STATE_LOGGED_OUT,
+            session.connection_state)
 
-    def test_logout_changes_connection_state(self):
-        session = spoticy.Session(self.config)
         session.login(SPOTIFY_USERNAME, SPOTIFY_PASSWORD)
-        # FIXME Make this pass
-        #wait_for_event(session, logged_in_event)
-        #session.logout()
-        #wait_for_event(session, logged_out_event)
-        #self.assertEqual(2, session.connection_state)
+        wait_for_event(session, logged_in_event)
+        self.assertEqual(spoticy.CONNECTION_STATE_LOGGED_IN,
+            session.connection_state)
+
+        session.logout()
+        wait_for_event(session, logged_out_event)
+        self.assertEqual(spoticy.CONNECTION_STATE_LOGGED_OUT,
+            session.connection_state)
