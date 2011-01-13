@@ -5,11 +5,32 @@ Spoticy
 `Python <http://www.python.org/>`_ written in
 `Cython <http://www.cython.org/>`_.
 
-.. warning::
 
-    This is currently a work in progress and is far from complete or usable.
-    You should regard this project as sandbox for learning Cython, and use
-    pyspotify instead.
+Current status
+--------------
+
+This is currently a work in progress and is far from complete or usable.  You
+should regard this project as sandbox for learning Cython, and use pyspotify
+instead.
+
+====================  ========  =====================
+Subsystem             Priority  Status
+====================  ========  =====================
+Error handling        1         Fully implemented
+Session handling      1         Partially implemented
+Link subsystem        4         Not implemented
+Track subsystem       2         Not implemented
+Album subsystem       3         Not implemented
+Artist subsystem      3         Not implemented
+Album browsing        6         Not implemented
+Artist browsing       6         Not implemented
+Image handling        6         Not implemented
+Search subsystem      5         Not implemented
+Playlist subsystem    2         Not implemented
+User handling         8         Not implemented
+Toplist handling      7         Not implemented
+Inbox subsystem       9         Not implemented
+====================  ========  =====================
 
 
 How to get started developing
