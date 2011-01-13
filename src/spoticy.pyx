@@ -210,3 +210,10 @@ cdef class Session(object):
         if self._session is NULL:
             raise Exception(u'Session not initialized')
         is_ok(libspotify.sp_session_logout(self._session))
+
+    def process_events(self):
+        if self._session is NULL:
+            raise Exception(u'Session not initialized')
+        cdef int ms_to_next_time
+        libspotify.sp_session_process_events(self._session, &ms_to_next_time)
+        return ms_to_next_time

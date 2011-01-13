@@ -37,3 +37,8 @@ class SessionTest(unittest.TestCase):
         session = spoticy.Session(self.config)
         session.release()
         self.assertEqual(None, session.connection_state)
+
+    def test_process_events_should_return_ms_to_wait_before_next_call(self):
+        session = spoticy.Session(self.config)
+        result = session.process_events()
+        self.assert_(result > 0)

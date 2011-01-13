@@ -108,3 +108,5 @@ cdef extern from 'libspotify/api.h':
     cdef sp_connectionstate sp_session_connectionstate(sp_session* session)
 
     cdef void* sp_session_userdata(sp_session* session)
+
+    cdef void* sp_session_process_events(sp_session* session, int* next_time)
