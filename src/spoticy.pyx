@@ -50,8 +50,9 @@ class SessionCallbacks(object):
     def notify_main_thread(self, session):
         pass
 
-    def music_delivery(self, session, audio_format, frames, num_frames):
-        pass
+    def music_delivery(self, session, sample_type, sample_rate, channels,
+            frames, num_frames):
+        return num_frames
 
     def play_token_lost(self, session):
         pass
@@ -74,7 +75,18 @@ class SessionCallbacks(object):
     def stop_playback(self, session):
         pass
 
-    def get_audio_buffer_stats(self, session, audio_buffer_stats):
+    def get_audio_buffer_stats(self, session):
+        """
+        Give stats on the application's audio buffers to libspotify.
+
+        Should return a dict with the keys 'samples' and 'stutter', where
+        the value of 'samples' is the number of samples in the buffer, and the
+        value of 'stutter' is the number of stutters (audio dropouts) since the
+        last time :meth:`get_audio_buffer_stats` was called.
+
+        This method must be implemented if you want to use the
+        :meth:`start_playback` and :meth:`stop_playback` callbacks.
+        """
         pass
 
 
@@ -111,6 +123,31 @@ cdef void session_callback_connection_error(libspotify.sp_session* sp_session,
         session._session = sp_session
         session_callbacks.connection_error(session, sp_error)
 
+cdef void session_callback_metadata_updated(
+        libspotify.sp_session* sp_session) with gil:
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        session_callbacks.metadata_updated(session)
+
+cdef void session_callback_message_to_user(
+        libspotify.sp_session* sp_session,
+        libspotify.const_char_ptr message) with gil:
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    cdef unicode message_unicode
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        message_unicode = message.decode(ENCODING)
+        session_callbacks.message_to_user(session, message)
+
 cdef void session_callback_notify_main_thread(
         libspotify.sp_session* sp_session) with gil:
     cdef void* userdata = libspotify.sp_session_userdata(sp_session)
@@ -121,6 +158,121 @@ cdef void session_callback_notify_main_thread(
         session = Session()
         session._session = sp_session
         session_callbacks.notify_main_thread(session)
+
+cdef int session_callback_music_delivery(
+        libspotify.sp_session* sp_session,
+        libspotify.const_sp_audioformat_ptr format,
+        libspotify.const_void_ptr frames, int num_frames) with gil:
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    cdef libspotify.sp_audioformat* audio_format = \
+        <libspotify.sp_audioformat*> format
+    cdef bytes frames_bytes
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        frames_bytes = <bytes>(<char*> frames)
+        num_frames_consumed = session_callbacks.music_delivery(session,
+            audio_format.sample_type, audio_format.sample_rate,
+            audio_format.channels, frames_bytes, num_frames)
+        return num_frames_consumed
+
+cdef void session_callback_play_token_lost(
+        libspotify.sp_session* sp_session) with gil:
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        session_callbacks.play_token_lost(session)
+
+cdef void session_callback_log_message(
+        libspotify.sp_session* sp_session,
+        libspotify.const_char_ptr data) with gil:
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    cdef unicode data_unicode
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        data_unicode = data.decode(ENCODING)
+        session_callbacks.log_message(session, data_unicode)
+
+cdef void session_callback_end_of_track(
+        libspotify.sp_session* sp_session) with gil:
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        session_callbacks.end_of_track(session)
+
+cdef void session_callback_streaming_error(libspotify.sp_session* sp_session,
+        libspotify.sp_error sp_error) with gil:
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        session_callbacks.streaming_error(session, sp_error)
+
+cdef void session_callback_userinfo_updated(
+        libspotify.sp_session* sp_session) with gil:
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        session_callbacks.userinfo_update(session)
+
+cdef void session_callback_start_playback(
+        libspotify.sp_session* sp_session) with gil:
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        session_callbacks.start_playback(session)
+
+cdef void session_callback_stop_playback(
+        libspotify.sp_session* sp_session) with gil:
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        session_callbacks.stop_playback(session)
+
+cdef void session_callback_get_audio_buffer_stats(
+        libspotify.sp_session* sp_session,
+        libspotify.sp_audio_buffer_stats* sp_stats) with gil:
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        stats = session_callbacks.stop_playback(session)
+        if stats is not None:
+            sp_stats.samples = stats['samples']
+            sp_stats.stutter = stats['stutter']
 
 
 ### Session config
@@ -156,7 +308,8 @@ cdef class SessionConfig(object):
             settings_location_str = settings_location.encode(ENCODING)
         self._config.settings_location = settings_location_str
 
-        self._config.application_key = <void*>(<char*> self._application_key)
+        self._config.application_key = <libspotify.const_void_ptr>(
+            <char*> self._application_key)
         self._config.application_key_size = len(self._application_key)
 
         if user_agent is None:
@@ -167,20 +320,21 @@ cdef class SessionConfig(object):
 
         self._callbacks.logged_in = session_callback_logged_in
         self._callbacks.logged_out = session_callback_logged_out
-        self._callbacks.metadata_updated = NULL # TODO
+        self._callbacks.metadata_updated = session_callback_metadata_updated
         self._callbacks.connection_error = session_callback_connection_error
-        self._callbacks.message_to_user = NULL # TODO
+        self._callbacks.message_to_user = session_callback_message_to_user
         self._callbacks.notify_main_thread = \
             session_callback_notify_main_thread
-        self._callbacks.music_delivery = NULL # TODO
-        self._callbacks.play_token_lost = NULL # TODO
-        self._callbacks.log_message = NULL # TODO
-        self._callbacks.end_of_track = NULL # TODO
-        self._callbacks.streaming_error = NULL # TODO
-        self._callbacks.userinfo_updated = NULL # TODO
-        self._callbacks.start_playback = NULL # TODO
-        self._callbacks.stop_playback = NULL # TODO
-        self._callbacks.get_audio_buffer_stats = NULL # TODO
+        self._callbacks.music_delivery = session_callback_music_delivery
+        self._callbacks.play_token_lost = session_callback_play_token_lost
+        self._callbacks.log_message = session_callback_log_message
+        self._callbacks.end_of_track = session_callback_end_of_track
+        self._callbacks.streaming_error = session_callback_streaming_error
+        self._callbacks.userinfo_updated = session_callback_userinfo_updated
+        self._callbacks.start_playback = session_callback_start_playback
+        self._callbacks.stop_playback = session_callback_stop_playback
+        self._callbacks.get_audio_buffer_stats = \
+            session_callback_get_audio_buffer_stats
         self._config.callbacks = &self._callbacks
 
         self._config.userdata = <void*> self._session_callbacks

@@ -2,6 +2,12 @@ cdef extern from 'libspotify/api.h':
 
     int SPOTIFY_API_VERSION
 
+    # Define const types to get the generated C code to match libspotify
+    ctypedef char* const_char_ptr "const char*"
+    ctypedef void* const_void_ptr "const void*"
+    cdef struct sp_audioformat
+    ctypedef sp_audioformat const_sp_audioformat_ptr "const sp_audioformat*"
+
     ### Opaque types/handles
 
     cdef struct sp_session:
@@ -38,7 +44,7 @@ cdef extern from 'libspotify/api.h':
     cdef enum sp_error:
         pass
 
-    cdef char* sp_error_message(sp_error error) nogil
+    cdef const_char_ptr sp_error_message(sp_error error) nogil
 
     ### Session handling
 
@@ -49,7 +55,7 @@ cdef extern from 'libspotify/api.h':
         pass
 
     cdef struct sp_audioformat:
-        sp_sampletype sampletype
+        sp_sampletype sample_type
         int sample_rate
         int channels
 
@@ -68,12 +74,13 @@ cdef extern from 'libspotify/api.h':
         void logged_out(sp_session* session)
         void metadata_updated(sp_session* session)
         void connection_error(sp_session* session, sp_error error)
-        void message_to_user(sp_session* session, char* message)
+        void message_to_user(sp_session* session, const_char_ptr message)
         void notify_main_thread(sp_session* session)
-        void music_delivery(sp_session* session, sp_audioformat* format,
-            void* frames, int num_frames)
+        int music_delivery(sp_session* session,
+            const_sp_audioformat_ptr format,
+            const_void_ptr frames, int num_frames)
         void play_token_lost(sp_session* session)
-        void log_message(sp_session* session, char* data)
+        void log_message(sp_session* session, const_char_ptr data)
         void end_of_track(sp_session* session)
         void streaming_error(sp_session* session, sp_error error)
         void userinfo_updated(sp_session* session)
@@ -84,13 +91,13 @@ cdef extern from 'libspotify/api.h':
 
     cdef struct sp_session_config:
         int api_version
-        char* cache_location
-        char* settings_location
-        void* application_key
+        const_char_ptr cache_location
+        const_char_ptr settings_location
+        const_void_ptr application_key
         size_t application_key_size
-        char* user_agent
+        const_char_ptr user_agent
         sp_session_callbacks* callbacks
-        void* userdata
+        const_void_ptr userdata
         bint tiny_settings
 
     cdef sp_error sp_session_create(sp_session_config* config, sp_session**
@@ -98,8 +105,8 @@ cdef extern from 'libspotify/api.h':
 
     cdef void sp_session_release(sp_session* session) nogil
 
-    cdef sp_error sp_session_login(sp_session* session, char* username, char*
-            password) nogil
+    cdef sp_error sp_session_login(sp_session* session,
+        const_char_ptr username, const_char_ptr password) nogil
 
     cdef sp_user* sp_session_user(sp_session* session) nogil
 
