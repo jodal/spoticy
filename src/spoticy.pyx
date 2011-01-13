@@ -2,7 +2,15 @@ cimport python_unicode
 
 cimport libspotify
 
+COMPATIBLE_API_VERSION = 6
 ENCODING = 'utf-8'
+
+assert libspotify.SPOTIFY_API_VERSION == COMPATIBLE_API_VERSION, (
+    u'This Spoticy version requires libspotify API version %(compatible)d, '
+    u'but libspotify API version %(actual)d was found.') % {
+        'compatible': COMPATIBLE_API_VERSION,
+        'actual': libspotify.SPOTIFY_API_VERSION,
+    }
 
 
 ### Error handling
