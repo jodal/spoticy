@@ -19,24 +19,16 @@ class SessionTest(unittest.TestCase):
         self.assertRaises(Exception, session.login,
             SPOTIFY_USERNAME, SPOTIFY_PASSWORD)
         self.assertRaises(Exception, session.logout)
-
-    def test_login_should_not_raise_exceptions(self):
-        session = spoticy.Session(self.config)
-        session.login(SPOTIFY_USERNAME, SPOTIFY_PASSWORD)
-        # TODO After logged_in callback, this should be true:
-        #self.assertEqual(1, session.connection_state)
-
-    def test_logout_should_not_raise_exceptions(self):
-        session = spoticy.Session(self.config)
-        session.login(SPOTIFY_USERNAME, SPOTIFY_PASSWORD)
-        session.logout()
-        # TODO After logged_in callback, this should be true:
-        #self.assertEqual(2, session.connection_state)
+        self.assertRaises(Exception, session.process_events)
 
     def test_release_should_not_raise_exceptions(self):
         session = spoticy.Session(self.config)
         session.release()
         self.assertEqual(None, session.connection_state)
+        self.assertRaises(Exception, session.login,
+            SPOTIFY_USERNAME, SPOTIFY_PASSWORD)
+        self.assertRaises(Exception, session.logout)
+        self.assertRaises(Exception, session.process_events)
 
     def test_process_events_should_return_ms_to_wait_before_next_call(self):
         session = spoticy.Session(self.config)
