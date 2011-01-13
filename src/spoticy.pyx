@@ -222,6 +222,11 @@ cdef class SessionConfig(object):
 
 ### Session handling
 
+CONNECTION_STATE_LOGGED_OUT = 0
+CONNECTION_STATE_LOGGED_IN = 1
+CONNECTION_STATE_DISCONNECTED = 2
+CONNECTION_STATE_UNDEFINED = 3
+
 cdef class Session(object):
     cdef libspotify.sp_session* _session
 
