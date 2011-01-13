@@ -78,7 +78,7 @@ class SessionCallbacks(object):
         pass
 
 
-cdef void logged_in_callback(libspotify.sp_session* sp_session,
+cdef void session_callback_logged_in(libspotify.sp_session* sp_session,
         libspotify.sp_error sp_error):
     cdef void* userdata = libspotify.sp_session_userdata(sp_session)
     cdef object session_callbacks
@@ -87,7 +87,39 @@ cdef void logged_in_callback(libspotify.sp_session* sp_session,
         session_callbacks = <object> userdata
         session = Session()
         session._session = sp_session
-        session_callbacks.logged_in(session_callbacks, session, sp_error)
+        session_callbacks.logged_in(session, sp_error)
+
+cdef void session_callback_logged_out(libspotify.sp_session* sp_session):
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        session_callbacks.logged_out(session)
+
+cdef void session_callback_connection_error(libspotify.sp_session* sp_session,
+        libspotify.sp_error sp_error):
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        session_callbacks.connection_error(session, sp_error)
+
+cdef void session_callback_notify_main_thread(
+        libspotify.sp_session* sp_session):
+    cdef void* userdata = libspotify.sp_session_userdata(sp_session)
+    cdef object session_callbacks
+    cdef Session session
+    if userdata is not NULL:
+        session_callbacks = <object> userdata
+        session = Session()
+        session._session = sp_session
+        session_callbacks.notify_main_thread(session)
 
 
 ### Session config
@@ -132,8 +164,22 @@ cdef class SessionConfig(object):
             user_agent_str = user_agent.encode(ENCODING)
         self._config.user_agent = user_agent_str
 
-        # TODO Add more callbacks
-        self._callbacks.logged_in = logged_in_callback
+        self._callbacks.logged_in = session_callback_logged_in
+        self._callbacks.logged_out = session_callback_logged_out
+        self._callbacks.metadata_updated = NULL # TODO
+        self._callbacks.connection_error = session_callback_connection_error
+        self._callbacks.message_to_user = NULL # TODO
+        self._callbacks.notify_main_thread = \
+            session_callback_notify_main_thread
+        self._callbacks.music_delivery = NULL # TODO
+        self._callbacks.play_token_lost = NULL # TODO
+        self._callbacks.log_message = NULL # TODO
+        self._callbacks.end_of_track = NULL # TODO
+        self._callbacks.streaming_error = NULL # TODO
+        self._callbacks.userinfo_updated = NULL # TODO
+        self._callbacks.start_playback = NULL # TODO
+        self._callbacks.stop_playback = NULL # TODO
+        self._callbacks.get_audio_buffer_stats = NULL # TODO
         self._config.callbacks = &self._callbacks
 
         self._config.userdata = <void*> self._session_callbacks
