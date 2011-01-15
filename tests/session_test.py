@@ -14,6 +14,7 @@ class SessionTest(unittest.TestCase):
         if self.session is not None:
             self.session.release()
 
+
     def test_create_session_with_valid_config_should_succeed(self):
         self.assertEqual(0, self.session.connection_state)
 
@@ -25,6 +26,7 @@ class SessionTest(unittest.TestCase):
         self.assertRaises(Exception, self.session.logout)
         self.assertRaises(Exception, self.session.process_events)
 
+
     def test_release_should_not_raise_exceptions(self):
         self.session.release()
         self.assertEqual(None, self.session.connection_state)
@@ -33,9 +35,11 @@ class SessionTest(unittest.TestCase):
         self.assertRaises(Exception, self.session.logout)
         self.assertRaises(Exception, self.session.process_events)
 
+
     def test_process_events_should_return_ms_to_wait_before_next_call(self):
         result = self.session.process_events()
         self.assert_(result > 0)
+
 
     def test_cache_size_should_be_settable_to_a_number_of_megabytes(self):
         self.session.cache_size_in_mb = 100
@@ -47,5 +51,26 @@ class SessionTest(unittest.TestCase):
         try:
             self.session.cache_size_in_mb
             self.fail(u'Cache size should not be readable')
+        except AttributeError:
+            pass
+
+
+    def test_preferred_bitrate_should_be_settable_to_160k(self):
+        self.session.preferred_bitrate = spoticy.BITRATE_160k
+
+    def test_preferred_bitrate_should_be_settable_to_320k(self):
+        self.session.preferred_bitrate = spoticy.BITRATE_320k
+
+    def test_preferred_bitrate_should_not_be_settable_to_anything_else(self):
+        try:
+            self.session.preferred_bitrate = 2
+            self.fail(u'Value must be 0 or 1')
+        except ValueError:
+            pass
+
+    def test_preferred_bitrate_should_not_be_readable(self):
+        try:
+            self.session.preferred_bitrate
+            self.fail(u'Preferred bitrate should not be readable')
         except AttributeError:
             pass

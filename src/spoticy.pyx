@@ -387,6 +387,8 @@ cdef class SessionConfig(object):
 
 ### Session handling
 
+BITRATE_160k = 0
+BITRATE_320k = 1
 CONNECTION_STATE_LOGGED_OUT = 0
 CONNECTION_STATE_LOGGED_IN = 1
 CONNECTION_STATE_DISCONNECTED = 2
@@ -422,6 +424,13 @@ cdef class Session(object):
         def __set__(self, value):
             if self._session is not NULL:
                 libspotify.sp_session_set_cache_size(self._session, value)
+
+    property preferred_bitrate:
+        def __set__(self, value):
+            if self._session is not NULL:
+                if value not in (0, 1):
+                    raise ValueError(u'Value must be 0 or 1')
+                libspotify.sp_session_preferred_bitrate(self._session, value)
 
     def login(self, unicode username, unicode password):
         if self._session is NULL:

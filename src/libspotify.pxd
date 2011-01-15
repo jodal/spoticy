@@ -122,6 +122,9 @@ cdef extern from 'libspotify/api.h':
     cdef void sp_session_process_events(sp_session* session, int* next_time) \
         nogil
 
+    cdef void sp_session_preferred_bitrate(sp_session* session,
+        sp_bitrate bitrate) nogil
+
     ### User handling
 
     cdef const_char_ptr sp_user_canonical_name(sp_user* user) nogil
