@@ -125,7 +125,14 @@ cdef extern from 'libspotify/api.h':
     cdef void sp_session_preferred_bitrate(sp_session* session,
         sp_bitrate bitrate) nogil
 
+    cdef int sp_session_num_friends(sp_session* session) nogil
+
+    cdef sp_user* sp_session_friend(sp_session* session, int index) nogil
+
     ### User handling
+
+    cdef enum sp_relation_type:
+        pass
 
     cdef const_char_ptr sp_user_canonical_name(sp_user* user) nogil
 
@@ -136,3 +143,6 @@ cdef extern from 'libspotify/api.h':
     cdef const_char_ptr sp_user_full_name(sp_user* user) nogil
 
     cdef const_char_ptr sp_user_picture(sp_user* user) nogil
+
+    cdef sp_relation_type sp_user_relation_type(sp_session* session,
+        sp_user* user) nogil

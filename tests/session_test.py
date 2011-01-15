@@ -1,12 +1,12 @@
 import unittest
 
 import spoticy
-from tests import settings
+from tests import settings, utils
 
 class SessionTest(unittest.TestCase):
     def setUp(self):
         application_key = open('tests/spotify_appkey.key').read()
-        callbacks = spoticy.SessionCallbacks()
+        callbacks = utils.TestSessionCallbacks()
         self.config = spoticy.SessionConfig(application_key, callbacks)
         self.session = spoticy.Session(self.config)
 

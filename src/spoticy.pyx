@@ -394,6 +394,8 @@ CONNECTION_STATE_LOGGED_IN = 1
 CONNECTION_STATE_DISCONNECTED = 2
 CONNECTION_STATE_UNDEFINED = 3
 
+cdef class User(object)
+
 cdef class Session(object):
     cdef libspotify.sp_session* _session
 
@@ -459,6 +461,16 @@ cdef class Session(object):
                 user._user = libspotify.sp_session_user(self._session)
                 return user
 
+    property friends:
+        def __get__(self):
+            cdef Friends friends = Friends()
+            friends.session = self
+            return friends
+
+    cpdef relation_type(self, User user):
+        if self.connection_state == CONNECTION_STATE_LOGGED_IN:
+            return libspotify.sp_user_relation_type(self._session, user._user)
+
 
 ### User handling
 
@@ -503,3 +515,22 @@ cdef class User(object):
                 picture_url = libspotify.sp_user_picture(self._user)
                 if picture_url is not NULL:
                     return picture_url.decode(ENCODING)
+
+
+cdef class Friends(object):
+    cdef Session session
+
+    def __len__(self):
+        if self.session.connection_state == CONNECTION_STATE_LOGGED_IN:
+            return libspotify.sp_session_num_friends(self.session._session)
+        else:
+            return 0
+
+    def __getitem__(self, index):
+        cdef User user = User()
+        if 0 <= index < len(self):
+            user._user = libspotify.sp_session_friend(
+                self.session._session, index)
+            return user
+        else:
+            raise IndexError(u'list index out of range')
