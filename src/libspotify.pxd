@@ -119,3 +119,15 @@ cdef extern from 'libspotify/api.h':
 
     cdef void* sp_session_process_events(sp_session* session, int* next_time) \
         nogil
+
+    ### User handling
+
+    cdef const_char_ptr sp_user_canonical_name(sp_user* user) nogil
+
+    cdef const_char_ptr sp_user_display_name(sp_user* user) nogil
+
+    cdef bint sp_user_is_loaded(sp_user* user) nogil
+
+    cdef const_char_ptr sp_user_full_name(sp_user* user) nogil
+
+    cdef const_char_ptr sp_user_picture(sp_user* user) nogil

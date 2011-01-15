@@ -437,3 +437,55 @@ cdef class Session(object):
         cdef int ms_to_next_time
         libspotify.sp_session_process_events(self._session, &ms_to_next_time)
         return ms_to_next_time
+
+    property user:
+        def __get__(self):
+            cdef User user = User()
+            if self.connection_state == CONNECTION_STATE_LOGGED_IN:
+                user._user = libspotify.sp_session_user(self._session)
+                return user
+
+
+### User handling
+
+RELATION_TYPE_UNKNOWN = 0
+RELATION_TYPE_NONE = 1
+RELATION_TYPE_UNIDIRECTIONAL = 2
+RELATION_TYPE_BIDIRECTIONAL = 3
+
+cdef class User(object):
+    cdef libspotify.sp_user* _user
+
+    property is_loaded:
+        def __get__(self):
+            if self._user is NULL:
+                return False
+            return libspotify.sp_user_is_loaded(self._user)
+
+    property canonical_name:
+        def __get__(self):
+            if self.is_loaded:
+                return libspotify.sp_user_canonical_name(
+                    self._user).decode(ENCODING)
+
+    property display_name:
+        def __get__(self):
+            if self.is_loaded:
+                return libspotify.sp_user_display_name(
+                    self._user).decode(ENCODING)
+
+    property full_name:
+        def __get__(self):
+            cdef libspotify.const_char_ptr full_name
+            if self.is_loaded:
+                full_name = libspotify.sp_user_full_name(self._user)
+                if full_name is not NULL:
+                    return full_name.decode(ENCODING)
+
+    property picture_url:
+        def __get__(self):
+            cdef libspotify.const_char_ptr picture_url
+            if self.is_loaded:
+                picture_url = libspotify.sp_user_picture(self._user)
+                if picture_url is not NULL:
+                    return picture_url.decode(ENCODING)

@@ -13,9 +13,9 @@ This is currently a work in progress and is far from complete or usable.  You
 should regard this project as sandbox for learning Cython, and use pyspotify
 instead.
 
-====================  ========  =====================
+====================  ========  ============================================
 Subsystem             Priority  Status
-====================  ========  =====================
+====================  ========  ============================================
 Error handling        1         Fully implemented
 Session handling      1         Partially implemented
 Link subsystem        4         Not implemented
@@ -27,10 +27,10 @@ Artist browsing       6         Not implemented
 Image handling        6         Not implemented
 Search subsystem      5         Not implemented
 Playlist subsystem    2         Not implemented
-User handling         8         Not implemented
+User handling         8         Implemented, except network/friends support
 Toplist handling      7         Not implemented
 Inbox subsystem       9         Not implemented
-====================  ========  =====================
+====================  ========  ============================================
 
 
 How to get started developing
@@ -69,8 +69,15 @@ How to get started developing
 
       USERNAME = u'alice'
       PASSWORD = u'secret'
+      USER_CANONICAL_NAME = u'alice'
+      USER_DISPLAY_NAME = u'alice'
+      USER_FULL_NAME = u'Alice in Wonderland'
+      USER_PICTURE_URL = None
 
-   Replace ``alice`` and ``secret`` with your own Spotify Premium account.
+   Replace ``alice`` and ``secret`` with your own Spotify Premium account, then
+   run the tests to see what values are correct for you for the other settings.
+   Defining these values before you start developing ensures that your changes
+   to the code doesn't affect the existing functionality.
 
 #. Build and run tests::
 
