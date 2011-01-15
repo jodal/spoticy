@@ -39,3 +39,19 @@ class SessionTest(unittest.TestCase):
         self.session = spoticy.Session(self.config)
         result = self.session.process_events()
         self.assert_(result > 0)
+
+    def test_cache_size_should_be_settable_to_a_number_of_megabytes(self):
+        self.session = spoticy.Session(self.config)
+        self.session.cache_size_in_mb = 100
+
+    def test_cache_size_should_be_settable_to_ten_percent_of_free_disk(self):
+        self.session = spoticy.Session(self.config)
+        self.session.cache_size_in_mb = 0 # == 10% of free disk
+
+    def test_cache_size_should_not_be_readable(self):
+        self.session = spoticy.Session(self.config)
+        try:
+            self.session.cache_size_in_mb
+            self.fail(u'Cache size should not be readable')
+        except AttributeError:
+            pass

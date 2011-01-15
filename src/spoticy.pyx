@@ -418,6 +418,11 @@ cdef class Session(object):
             if self._session is not NULL:
                 return libspotify.sp_session_connectionstate(self._session)
 
+    property cache_size_in_mb:
+        def __set__(self, value):
+            if self._session is not NULL:
+                libspotify.sp_session_set_cache_size(self._session, value)
+
     def login(self, unicode username, unicode password):
         if self._session is NULL:
             raise Exception(u'Session not initialized')

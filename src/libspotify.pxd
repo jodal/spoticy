@@ -117,7 +117,9 @@ cdef extern from 'libspotify/api.h':
 
     cdef void* sp_session_userdata(sp_session* session) nogil
 
-    cdef void* sp_session_process_events(sp_session* session, int* next_time) \
+    cdef void sp_session_set_cache_size(sp_session* session, size_t size) nogil
+
+    cdef void sp_session_process_events(sp_session* session, int* next_time) \
         nogil
 
     ### User handling
