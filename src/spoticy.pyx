@@ -246,7 +246,7 @@ cdef void session_callback_userinfo_updated(
         session_callbacks = <object> userdata
         session = Session()
         session._session = sp_session
-        session_callbacks.userinfo_update(session)
+        session_callbacks.userinfo_updated(session)
 
 cdef void session_callback_start_playback(
         libspotify.sp_session* sp_session) with gil:
