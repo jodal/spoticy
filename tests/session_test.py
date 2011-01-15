@@ -1,7 +1,7 @@
 import unittest
 
 import spoticy
-from tests.settings import SPOTIFY_USERNAME, SPOTIFY_PASSWORD
+from tests import settings
 
 class SessionTest(unittest.TestCase):
     def setUp(self):
@@ -22,7 +22,7 @@ class SessionTest(unittest.TestCase):
         self.session = spoticy.Session()
         self.assertEqual(None, self.session.connection_state)
         self.assertRaises(Exception, self.session.login,
-            SPOTIFY_USERNAME, SPOTIFY_PASSWORD)
+            settings.USERNAME, settings.PASSWORD)
         self.assertRaises(Exception, self.session.logout)
         self.assertRaises(Exception, self.session.process_events)
 
@@ -31,7 +31,7 @@ class SessionTest(unittest.TestCase):
         self.session.release()
         self.assertEqual(None, self.session.connection_state)
         self.assertRaises(Exception, self.session.login,
-            SPOTIFY_USERNAME, SPOTIFY_PASSWORD)
+            settings.USERNAME, settings.PASSWORD)
         self.assertRaises(Exception, self.session.logout)
         self.assertRaises(Exception, self.session.process_events)
 

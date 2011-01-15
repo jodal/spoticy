@@ -1,8 +1,7 @@
 import unittest
 
 import spoticy
-from tests import utils
-from tests.settings import SPOTIFY_USERNAME, SPOTIFY_PASSWORD
+from tests import settings, utils
 
 class SessionCallbacksTest(unittest.TestCase):
     def setUp(self):
@@ -20,7 +19,7 @@ class SessionCallbacksTest(unittest.TestCase):
         self.assertEqual(spoticy.CONNECTION_STATE_LOGGED_OUT,
             self.session.connection_state)
 
-        self.session.login(SPOTIFY_USERNAME, SPOTIFY_PASSWORD)
+        self.session.login(settings.USERNAME, settings.PASSWORD)
         utils.wait_for_event(self.session, utils.logged_in_event)
         self.assertEqual(spoticy.CONNECTION_STATE_LOGGED_IN,
             self.session.connection_state)

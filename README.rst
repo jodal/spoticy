@@ -67,8 +67,8 @@ How to get started developing
 
 #. Create a file named ``tests/settings.py`` containing the following::
 
-      SPOTIFY_USERNAME = u'alice'
-      SPOTIFY_PASSWORD = u'secret'
+      USERNAME = u'alice'
+      PASSWORD = u'secret'
 
    Replace ``alice`` and ``secret`` with your own Spotify Premium account.
 
