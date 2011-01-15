@@ -9,7 +9,7 @@ build: clean
 	python setup.py build_ext --inplace
 
 test: build
-	nosetests
+	nosetests $(NOSEARGS)
 
 itest:
 	while true; do inotifywait -e modify --exclude '.*\.swp' src/ tests/; make test; done
