@@ -407,7 +407,10 @@ cdef class Session(object):
 
     def release(self):
         if self._session is not NULL:
-            libspotify.sp_session_release(self._session)
+            # FIXME Releasing the session seems to cause segfaults when
+            # creating a new session later in the same process's lifetime, e.g.
+            # when running all tests in one run.
+            #libspotify.sp_session_release(self._session)
             self._session = NULL
 
     property connection_state:
