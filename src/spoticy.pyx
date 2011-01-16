@@ -463,9 +463,7 @@ cdef class Session(object):
 
     property friends:
         def __get__(self):
-            cdef Friends friends = Friends()
-            friends.session = self
-            return friends
+            return Friends(self)
 
     cpdef relation_type(self, User user):
         if self.connection_state == CONNECTION_STATE_LOGGED_IN:
@@ -519,6 +517,9 @@ cdef class User(object):
 
 cdef class Friends(object):
     cdef Session session
+
+    def __init__(self, Session session):
+        self.session = session
 
     def __len__(self):
         if self.session.connection_state == CONNECTION_STATE_LOGGED_IN:
