@@ -105,10 +105,9 @@ cdef class Playlists(object):
         else:
             return 0
 
-    property owner:
-        def __get__(self):
-            cdef User user = User()
-            if self._playlist_container is not NULL:
-                user._user = libspotify.sp_playlistcontainer_owner(
-                    self._playlist_container)
-                return user
+    def get_owner(self):
+        cdef User user = User()
+        if self._playlist_container is not NULL:
+            user._user = libspotify.sp_playlistcontainer_owner(
+                self._playlist_container)
+            return user

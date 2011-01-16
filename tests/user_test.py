@@ -15,32 +15,34 @@ class UserTest(unittest.TestCase):
             self.session.release()
 
     def test_user_is_not_available_when_not_logged_in(self):
-        self.assertEqual(None, self.session.user)
+        self.assertEqual(None, self.session.get_user())
 
     def test_user_is_available_when_logged_in(self):
         self.session.login(settings.USERNAME, settings.PASSWORD)
         utils.wait_for_event(self.session, utils.logged_in_event)
+        user = self.session.get_user()
 
-        self.assertTrue(self.session.user.is_loaded)
+        self.assertTrue(user.is_loaded)
 
-        self.assertEqual(settings.USER_CANONICAL_NAME,
-            self.session.user.canonical_name)
-        self.assertEqual(settings.USER_DISPLAY_NAME,
-            self.session.user.display_name)
-        self.assertEqual(settings.USER_FULL_NAME, self.session.user.full_name)
-        self.assertEqual(settings.USER_PICTURE_URL,
-            self.session.user.picture_url)
+        self.assertEqual(settings.USER_CANONICAL_NAME, user.canonical_name)
+        self.assertEqual(settings.USER_DISPLAY_NAME, user.display_name)
+        self.assertEqual(settings.USER_FULL_NAME, user.full_name)
+        self.assertEqual(settings.USER_PICTURE_URL, user.picture_url)
 
     def test_friends_is_a_sequence_and_you_got_relations_to_friends(self):
         self.session.login(settings.USERNAME, settings.PASSWORD)
         utils.wait_for_event(self.session, utils.logged_in_event)
 
-        num_friends = len(self.session.friends)
+        friends = self.session.get_friends()
+        num_friends = len(friends)
         self.assert_(num_friends >= 0)
         if num_friends > 0:
             try:
-                friend = self.session.friends[num_friends - 1]
+                friend = friends[num_friends - 1]
                 self.assertTrue(friend.is_loaded)
-                self.assert_(self.session.relation_type(friend) in range(0, 5))
+                self.assert_(self.session.relation_type(friend) in (
+                    RELATION_TYPE_UNKNOWN, RELATION_TYPE_NONE,
+                    RELATION_TYPE_UNIDIRECTIONAL, RELATION_TYPE_BIDIRECTIONAL
+                ))
             except IndexError:
                 self.fail(u'Should be able to read elements from sequence')

@@ -424,16 +424,14 @@ cdef class Session(object):
                 libspotify.sp_session_playlistcontainer(self._session)
         return playlists
 
-    property user:
-        def __get__(self):
-            cdef User user = User()
-            if self.connection_state == CONNECTION_STATE_LOGGED_IN:
-                user._user = libspotify.sp_session_user(self._session)
-                return user
+    def get_user(self):
+        cdef User user = User()
+        if self.connection_state == CONNECTION_STATE_LOGGED_IN:
+            user._user = libspotify.sp_session_user(self._session)
+            return user
 
-    property friends:
-        def __get__(self):
-            return Friends(self)
+    def get_friends(self):
+        return Friends(self)
 
     def relation_type(self, User user):
         if self.connection_state == CONNECTION_STATE_LOGGED_IN:
