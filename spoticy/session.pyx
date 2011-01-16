@@ -417,9 +417,12 @@ cdef class Session(object):
         libspotify.sp_session_process_events(self._session, &ms_to_next_time)
         return ms_to_next_time
 
-    property playlists:
-        def __get__(self):
-            return Playlists(self)
+    def get_playlists(self):
+        cdef Playlists playlists = Playlists()
+        if self.connection_state == CONNECTION_STATE_LOGGED_IN:
+            playlists._playlist_container = \
+                libspotify.sp_session_playlistcontainer(self._session)
+        return playlists
 
     property user:
         def __get__(self):

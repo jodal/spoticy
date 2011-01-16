@@ -11,6 +11,7 @@ awoken = threading.Event()
 timer = None
 logged_in_event = threading.Event()
 logged_out_event = threading.Event()
+playlists_loaded_event = threading.Event()
 
 def wait_for_event(session, event):
     while not event.is_set():
@@ -38,4 +39,20 @@ class TestSessionCallbacks(spoticy.SessionCallbacks):
 
     def notify_main_thread(self, session):
         log('notify_main_thread called')
+        awoken.set()
+
+class TestPlaylistsCallbacks(spoticy.PlaylistsCallbacks):
+    def playlist_added(self, playlists, added_playlist, added_position):
+        log('playlist_added called')
+
+    def playlist_removed(self, playlists, removed_playlist, removed_position):
+        log('playlist_removed called')
+
+    def playlist_moved(self, playlists, moved_playlist,
+            old_position, new_position):
+        log('playlist_moved called')
+
+    def container_loaded(self, playlists):
+        log('container_loaded called')
+        playlists_loaded_event.set()
         awoken.set()

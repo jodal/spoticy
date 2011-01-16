@@ -15,14 +15,20 @@ class PlaylistsTest(unittest.TestCase):
             self.session.release()
 
     def test_playlists_is_empty_when_logged_out(self):
-        self.assertEqual(None, self.session.playlists.owner)
-        self.assertEqual(0, len(self.session.playlists))
+        playlists = self.session.get_playlists()
+        self.assertEqual(None, playlists.owner)
+        self.assertEqual(0, len(playlists))
 
     def test_playlists_is_available_when_logged_in(self):
         self.session.login(settings.USERNAME, settings.PASSWORD)
         utils.wait_for_event(self.session, utils.logged_in_event)
+        playlists = self.session.get_playlists()
 
         self.assertEqual(self.session.user.canonical_name,
-            self.session.playlists.owner.canonical_name)
+            playlists.owner.canonical_name)
 
-        self.assert_(len(self.session.playlists) >= 0)
+        self.assertEqual(0, len(playlists))
+        playlists.add_callbacks(utils.TestPlaylistsCallbacks())
+        utils.wait_for_event(self.session, utils.playlists_loaded_event)
+        num_playlists = len(playlists)
+        self.assert_(num_playlists >= 0)

@@ -134,6 +134,21 @@ cdef extern from 'libspotify/api.h':
 
     ### Playlist subsystem
 
+    cdef struct sp_playlistcontainer_callbacks:
+        void playlist_added(sp_playlistcontainer* pc, sp_playlist* p,
+            int position, void* userdata)
+        void playlist_removed(sp_playlistcontainer* pc, sp_playlist* p,
+            int position, void* userdata)
+        void playlist_moved(sp_playlistcontainer* pc, sp_playlist* p,
+            int position, int new_position, void* userdata)
+        void container_loaded(sp_playlistcontainer* pc, void* userdata)
+
+    cdef void sp_playlistcontainer_add_callbacks(sp_playlistcontainer* pc,
+        sp_playlistcontainer_callbacks* callbacks, void* userdata) nogil
+
+    cdef void sp_playlistcontainer_remove_callbacks(sp_playlistcontainer* pc,
+        sp_playlistcontainer_callbacks* callbacks, void* userdata) nogil
+
     cdef int sp_playlistcontainer_num_playlists(sp_playlistcontainer* pc) \
         nogil
 
