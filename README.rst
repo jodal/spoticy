@@ -26,7 +26,7 @@ Album browsing        6         Not implemented
 Artist browsing       6         Not implemented
 Image handling        6         Not implemented
 Search subsystem      5         Not implemented
-Playlist subsystem    2         Not implemented
+Playlist subsystem    2         Partially implemented
 User handling         8         Implemented
 Toplist handling      7         Not implemented
 Inbox subsystem       9         Not implemented

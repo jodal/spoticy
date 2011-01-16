@@ -122,12 +122,22 @@ cdef extern from 'libspotify/api.h':
     cdef void sp_session_process_events(sp_session* session, int* next_time) \
         nogil
 
+    cdef sp_playlistcontainer* sp_session_playlistcontainer(
+        sp_session* session) nogil
+
     cdef void sp_session_preferred_bitrate(sp_session* session,
         sp_bitrate bitrate) nogil
 
     cdef int sp_session_num_friends(sp_session* session) nogil
 
     cdef sp_user* sp_session_friend(sp_session* session, int index) nogil
+
+    ### Playlist subsystem
+
+    cdef int sp_playlistcontainer_num_playlists(sp_playlistcontainer* pc) \
+        nogil
+
+    cdef sp_user* sp_playlistcontainer_owner(sp_playlistcontainer* pc) nogil
 
     ### User handling
 

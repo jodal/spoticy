@@ -394,6 +394,8 @@ CONNECTION_STATE_LOGGED_IN = 1
 CONNECTION_STATE_DISCONNECTED = 2
 CONNECTION_STATE_UNDEFINED = 3
 
+cdef class Playlists(object)
+
 cdef class User(object)
 
 cdef class Session(object):
@@ -454,6 +456,10 @@ cdef class Session(object):
         libspotify.sp_session_process_events(self._session, &ms_to_next_time)
         return ms_to_next_time
 
+    property playlists:
+        def __get__(self):
+            return Playlists(self)
+
     property user:
         def __get__(self):
             cdef User user = User()
@@ -468,6 +474,32 @@ cdef class Session(object):
     cpdef relation_type(self, User user):
         if self.connection_state == CONNECTION_STATE_LOGGED_IN:
             return libspotify.sp_user_relation_type(self._session, user._user)
+
+
+### Playlist handling
+
+cdef class Playlists(object):
+    cdef libspotify.sp_playlistcontainer* _playlist_container
+
+    def __init__(self, Session session):
+        if session.connection_state == CONNECTION_STATE_LOGGED_IN:
+            self._playlist_container = \
+                libspotify.sp_session_playlistcontainer(session._session)
+
+    def __len__(self):
+        if self._playlist_container is not NULL:
+            return libspotify.sp_playlistcontainer_num_playlists(
+                self._playlist_container)
+        else:
+            return 0
+
+    property owner:
+        def __get__(self):
+            cdef User user = User()
+            if self._playlist_container is not NULL:
+                user._user = libspotify.sp_playlistcontainer_owner(
+                    self._playlist_container)
+                return user
 
 
 ### User handling
