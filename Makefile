@@ -3,7 +3,7 @@
 all: test
 
 clean:
-	rm -rf build/ *.so */*.c */*.pyc
+	rm -rf build/ */*.c */*.so */*.pyc
 
 build: clean
 	python setup.py build_ext --inplace

@@ -3,7 +3,9 @@ from distutils.extension import Extension
 from Cython.Distutils import build_ext
 
 ext_modules = [
-    Extension('spoticy', ['src/spoticy.pyx'], libraries=['spotify'])
+    Extension('spoticy.%s' % module, ['spoticy/%s.pyx' % module],
+        include_dirs=['.'], libraries=['spotify'])
+    for module in ('core', 'playlist', 'session', 'user')
 ]
 
 setup(

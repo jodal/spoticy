@@ -1,35 +1,10 @@
 cimport python_unicode
 
-cimport libspotify
-
-COMPATIBLE_API_VERSION = 6
-ENCODING = 'utf-8'
-
-assert libspotify.SPOTIFY_API_VERSION == COMPATIBLE_API_VERSION, (
-    u'This Spoticy version requires libspotify API version %(compatible)d, '
-    u'but libspotify API version %(actual)d was found.') % {
-        'compatible': COMPATIBLE_API_VERSION,
-        'actual': libspotify.SPOTIFY_API_VERSION,
-    }
-
-
-### Error handling
-
-ERROR_OK = 0
-
-class SpotifyException(Exception):
-    def __init__(self, sp_error):
-        self.error_code = sp_error
-        message = '%s (sp_error=%d)' % (
-            libspotify.sp_error_message(sp_error), sp_error)
-        super(Exception, self).__init__(message)
-
-cpdef bint is_ok(libspotify.sp_error sp_error) except False:
-    if sp_error == ERROR_OK:
-        return True
-    else:
-        raise SpotifyException(sp_error)
-        return False
+from spoticy cimport libspotify
+from spoticy.core cimport *
+from spoticy.core import *
+from spoticy.playlist cimport Playlists
+from spoticy.user cimport Friends, User
 
 
 ### Session callbacks
@@ -99,7 +74,6 @@ class SessionCallbacks(object):
         :meth:`start_playback` and :meth:`stop_playback` callbacks.
         """
         pass
-
 
 cdef void session_callback_logged_in(libspotify.sp_session* sp_session,
         libspotify.sp_error sp_error) with gil:
@@ -387,20 +361,7 @@ cdef class SessionConfig(object):
 
 ### Session handling
 
-BITRATE_160k = 0
-BITRATE_320k = 1
-CONNECTION_STATE_LOGGED_OUT = 0
-CONNECTION_STATE_LOGGED_IN = 1
-CONNECTION_STATE_DISCONNECTED = 2
-CONNECTION_STATE_UNDEFINED = 3
-
-cdef class Playlists(object)
-
-cdef class User(object)
-
 cdef class Session(object):
-    cdef libspotify.sp_session* _session
-
     def __init__(self, SessionConfig config=None):
         if config is not None:
             is_ok(libspotify.sp_session_create(
@@ -432,8 +393,8 @@ cdef class Session(object):
     property preferred_bitrate:
         def __set__(self, value):
             if self._session is not NULL:
-                if value not in (0, 1):
-                    raise ValueError(u'Value must be 0 or 1')
+                if value not in (BITRATE_160k, BITRATE_320k):
+                    raise ValueError(u'Value must be a known bitrate')
                 libspotify.sp_session_preferred_bitrate(self._session, value)
 
     def login(self, unicode username, unicode password):
@@ -471,99 +432,6 @@ cdef class Session(object):
         def __get__(self):
             return Friends(self)
 
-    cpdef relation_type(self, User user):
+    def relation_type(self, User user):
         if self.connection_state == CONNECTION_STATE_LOGGED_IN:
             return libspotify.sp_user_relation_type(self._session, user._user)
-
-
-### Playlist handling
-
-cdef class Playlists(object):
-    cdef libspotify.sp_playlistcontainer* _playlist_container
-
-    def __init__(self, Session session):
-        if session.connection_state == CONNECTION_STATE_LOGGED_IN:
-            self._playlist_container = \
-                libspotify.sp_session_playlistcontainer(session._session)
-
-    def __len__(self):
-        if self._playlist_container is not NULL:
-            return libspotify.sp_playlistcontainer_num_playlists(
-                self._playlist_container)
-        else:
-            return 0
-
-    property owner:
-        def __get__(self):
-            cdef User user = User()
-            if self._playlist_container is not NULL:
-                user._user = libspotify.sp_playlistcontainer_owner(
-                    self._playlist_container)
-                return user
-
-
-### User handling
-
-RELATION_TYPE_UNKNOWN = 0
-RELATION_TYPE_NONE = 1
-RELATION_TYPE_UNIDIRECTIONAL = 2
-RELATION_TYPE_BIDIRECTIONAL = 3
-
-cdef class User(object):
-    cdef libspotify.sp_user* _user
-
-    property is_loaded:
-        def __get__(self):
-            if self._user is NULL:
-                return False
-            return libspotify.sp_user_is_loaded(self._user)
-
-    property canonical_name:
-        def __get__(self):
-            if self.is_loaded:
-                return libspotify.sp_user_canonical_name(
-                    self._user).decode(ENCODING)
-
-    property display_name:
-        def __get__(self):
-            if self.is_loaded:
-                return libspotify.sp_user_display_name(
-                    self._user).decode(ENCODING)
-
-    property full_name:
-        def __get__(self):
-            cdef libspotify.const_char_ptr full_name
-            if self.is_loaded:
-                full_name = libspotify.sp_user_full_name(self._user)
-                if full_name is not NULL:
-                    return full_name.decode(ENCODING)
-
-    property picture_url:
-        def __get__(self):
-            cdef libspotify.const_char_ptr picture_url
-            if self.is_loaded:
-                picture_url = libspotify.sp_user_picture(self._user)
-                if picture_url is not NULL:
-                    return picture_url.decode(ENCODING)
-
-
-cdef class Friends(object):
-    cdef Session session
-
-    def __init__(self, Session session):
-        self.session = session
-
-    def __len__(self):
-        if self.session.connection_state == CONNECTION_STATE_LOGGED_IN:
-            return libspotify.sp_session_num_friends(self.session._session)
-        else:
-            return 0
-
-    def __getitem__(self, index):
-        cdef User user = User()
-        if 0 <= index < len(self):
-            user._user = libspotify.sp_session_friend(
-                self.session._session, index)
-            return user
-        else:
-            raise IndexError(u'list index out of range')
