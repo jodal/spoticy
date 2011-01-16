@@ -74,17 +74,3 @@ class SessionTest(unittest.TestCase):
             self.fail(u'Preferred bitrate should not be readable')
         except AttributeError:
             pass
-
-
-    def test_playlists_is_empty_when_logged_out(self):
-        self.assertEqual(None, self.session.playlists.owner)
-        self.assertEqual(0, len(self.session.playlists))
-
-    def test_playlists_when_logged_in(self):
-        self.session.login(settings.USERNAME, settings.PASSWORD)
-        utils.wait_for_event(self.session, utils.logged_in_event)
-
-        self.assertEqual(self.session.user.canonical_name,
-            self.session.playlists.owner.canonical_name)
-
-        self.assert_(len(self.session.playlists) >= 0)
