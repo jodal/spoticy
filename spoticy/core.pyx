@@ -34,7 +34,7 @@ assert libspotify.SPOTIFY_API_VERSION == COMPATIBLE_API_VERSION, (
 
 ### Error handling
 
-class SpotifyException(Exception):
+class SpotifyError(Exception):
     def __init__(self, sp_error):
         self.error_code = sp_error
         message = '%s (sp_error=%d)' % (
@@ -45,5 +45,5 @@ cpdef bint is_ok(libspotify.sp_error sp_error) except False:
     if sp_error == ERROR_OK:
         return True
     else:
-        raise SpotifyException(sp_error)
+        raise SpotifyError(sp_error)
         return False
