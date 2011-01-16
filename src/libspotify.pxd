@@ -100,8 +100,8 @@ cdef extern from 'libspotify/api.h':
         const_void_ptr userdata
         bint tiny_settings
 
-    cdef sp_error sp_session_create(sp_session_config* config, sp_session**
-            session) nogil
+    cdef sp_error sp_session_create(sp_session_config* config,
+        sp_session** session) nogil
 
     cdef void sp_session_release(sp_session* session) nogil
 
